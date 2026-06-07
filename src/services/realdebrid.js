@@ -50,11 +50,14 @@ export const rd = {
 
   async resolveStream(stream, token, onStatus) {
     if (stream.url) {
-      const result = await rd.unrestrict(stream.url, token);
-      return result.download;
+      // Torrentio+RD returns already-unrestricted direct CDN links.
+      // Calling /unrestrict/link on them triggers a CORS preflight that fails on iOS.
+      // Use the URL as-is — it's a direct playable file link.
+      return stream.url;
     }
 
     if (stream.infoHash) {
+      // Manually add magnet to RD, wait for download, then unrestrict file link.
       const added = await rd.addMagnet(stream.infoHash, token);
       await rd.selectFiles(added.id, token);
 

@@ -174,7 +174,7 @@ export default function Detail({ type }) {
       <div className="relative h-52 md:h-80 overflow-hidden bg-surface">
         {backdrop && (
           <>
-            <img src={backdrop} alt="" className="w-full h-full object-cover object-top" />
+            <img src={backdrop} alt="" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/60 to-transparent" />
           </>
         )}
