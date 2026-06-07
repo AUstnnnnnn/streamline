@@ -21,6 +21,12 @@ function Shell({ children }) {
   return (
     <div className="min-h-screen bg-gray-950">
       <Navbar />
+      {/* Mobile: push content below the status bar via safe-area-inset-top */}
+      <div
+        className="md:hidden"
+        style={{ height: 'env(safe-area-inset-top, 0px)' }}
+        aria-hidden="true"
+      />
       {children}
     </div>
   )

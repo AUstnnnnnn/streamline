@@ -12,7 +12,7 @@ import StreamPicker from '../components/StreamPicker'
 function Skeleton() {
   return (
     <div className="animate-pulse">
-      <div className="h-48 md:h-72 bg-surface-2" />
+      <div className="h-52 md:h-72 bg-surface-2" />
       <div className="px-4 pt-4 space-y-3">
         <div className="h-6 w-48 bg-surface-2 rounded" />
         <div className="h-4 w-32 bg-surface-2 rounded" />
@@ -98,7 +98,7 @@ export default function Detail({ type }) {
         },
       })
     } catch (err) {
-      setError(err.message || 'Failed to start playback')
+      setError(`Unrestrict failed: ${err.message}`)
     } finally {
       setResolving(false)
       setResolveStatus('')
@@ -107,7 +107,7 @@ export default function Detail({ type }) {
 
   async function handlePlay() {
     if (!extIds?.imdb_id) {
-      setError('No IMDB ID found — cannot fetch streams.')
+      setError('No IMDB ID — cannot fetch streams.')
       return
     }
 
@@ -124,6 +124,13 @@ export default function Detail({ type }) {
         rdToken
       )
 
+      if (rawStreams.length === 0) {
+        setError('No streams found for this title.')
+        setResolving(false)
+        setResolveStatus('')
+        return
+      }
+
       const sorted = sortStreams(filterByPreference(rawStreams, qualityPref))
       const bestCached = sorted.find(isCached)
 
@@ -136,7 +143,7 @@ export default function Detail({ type }) {
         setResolveStatus('')
       }
     } catch (err) {
-      setError(err.message || 'Failed to fetch streams')
+      setError(`Stream fetch failed: ${err.message}`)
       setResolving(false)
       setResolveStatus('')
     }
@@ -163,17 +170,18 @@ export default function Detail({ type }) {
 
   return (
     <div className="pb-24 md:pb-6 min-h-screen">
-      {/* Backdrop hero */}
+      {/* Backdrop hero — extends under status bar; back button uses safe-area offset */}
       <div className="relative h-52 md:h-80 overflow-hidden bg-surface">
         {backdrop && (
           <>
-            <img src={backdrop} alt="" className="w-full h-full object-cover" />
+            <img src={backdrop} alt="" className="w-full h-full object-cover object-top" />
             <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/60 to-transparent" />
           </>
         )}
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
+          className="absolute left-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -221,7 +229,7 @@ export default function Detail({ type }) {
             <select
               value={season}
               onChange={e => { setSeason(Number(e.target.value)); setEpisode(1) }}
-              className="flex-1 bg-surface border border-gray-700 text-white text-sm rounded-lg px-3 py-2.5 outline-none focus:border-accent"
+              className="flex-1 bg-surface border border-gray-700 text-white rounded-lg px-3 py-2.5 outline-none focus:border-accent"
             >
               {data.seasons
                 .filter(s => s.season_number > 0)
@@ -235,7 +243,7 @@ export default function Detail({ type }) {
             <select
               value={episode}
               onChange={e => setEpisode(Number(e.target.value))}
-              className="flex-1 bg-surface border border-gray-700 text-white text-sm rounded-lg px-3 py-2.5 outline-none focus:border-accent"
+              className="flex-1 bg-surface border border-gray-700 text-white rounded-lg px-3 py-2.5 outline-none focus:border-accent"
             >
               {(seasonData?.episodes ?? []).map(ep => (
                 <option key={ep.episode_number} value={ep.episode_number}>
@@ -255,7 +263,7 @@ export default function Detail({ type }) {
           {resolving ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span className="text-sm">{resolveStatus || 'Loading…'}</span>
+              <span>{resolveStatus || 'Loading…'}</span>
             </>
           ) : (
             <>
