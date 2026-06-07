@@ -10,23 +10,18 @@ function RequireSettings({ children }) {
   const location = useLocation()
   const tmdbKey = localStorage.getItem('sl_tmdb_key')
   const rdToken = localStorage.getItem('sl_rd_token')
-
   if (!tmdbKey || !rdToken) {
     return <Navigate to="/settings" state={{ from: location }} replace />
   }
   return children
 }
 
+// Shell has NO top spacer — each page handles its own safe area so
+// Detail's backdrop can go full-bleed under the status bar.
 function Shell({ children }) {
   return (
     <div className="min-h-screen bg-gray-950">
       <Navbar />
-      {/* Mobile: push content below the status bar via safe-area-inset-top */}
-      <div
-        className="md:hidden"
-        style={{ height: 'env(safe-area-inset-top, 0px)' }}
-        aria-hidden="true"
-      />
       {children}
     </div>
   )
@@ -37,49 +32,11 @@ export default function App() {
     <HashRouter>
       <Routes>
         <Route path="/settings" element={<Settings />} />
-
-        <Route
-          path="/player"
-          element={
-            <RequireSettings>
-              <Player />
-            </RequireSettings>
-          }
-        />
-
-        <Route
-          path="/"
-          element={
-            <RequireSettings>
-              <Shell><Home /></Shell>
-            </RequireSettings>
-          }
-        />
-        <Route
-          path="/search"
-          element={
-            <RequireSettings>
-              <Shell><Search /></Shell>
-            </RequireSettings>
-          }
-        />
-        <Route
-          path="/movie/:id"
-          element={
-            <RequireSettings>
-              <Shell><Detail type="movie" /></Shell>
-            </RequireSettings>
-          }
-        />
-        <Route
-          path="/tv/:id"
-          element={
-            <RequireSettings>
-              <Shell><Detail type="tv" /></Shell>
-            </RequireSettings>
-          }
-        />
-
+        <Route path="/player" element={<RequireSettings><Player /></RequireSettings>} />
+        <Route path="/" element={<RequireSettings><Shell><Home /></Shell></RequireSettings>} />
+        <Route path="/search" element={<RequireSettings><Shell><Search /></Shell></RequireSettings>} />
+        <Route path="/movie/:id" element={<RequireSettings><Shell><Detail type="movie" /></Shell></RequireSettings>} />
+        <Route path="/tv/:id" element={<RequireSettings><Shell><Detail type="tv" /></Shell></RequireSettings>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>

@@ -30,7 +30,6 @@ export default function Home() {
   }, [])
 
   if (loading) return <Spinner />
-
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3 text-center px-4">
@@ -41,7 +40,11 @@ export default function Home() {
   }
 
   return (
-    <div className="pt-4 pb-24 md:pb-6">
+    // iPhone 16 status bar = 59pt; use env() with 60px fallback
+    <div
+      className="pb-24 md:pb-6"
+      style={{ paddingTop: 'max(60px, env(safe-area-inset-top, 60px))' }}
+    >
       {continueWatching.length > 0 && (
         <PosterRow title="Continue Watching" items={continueWatching} isContinue />
       )}
